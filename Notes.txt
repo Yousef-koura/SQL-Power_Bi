@@ -1,0 +1,135 @@
+Database: is a collection of tabular data built across rows and columns.
+
+Query:
+
+	1. Basic SELECT Query
+		SELECT * FROM <database name>.<table name>;  		     		   	           				    # Returns all columns and rows from the specified table
+	  ex. SELECT * FROM movies;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	2. SELECT with Specific Columns
+		SELECT column1, column2 FROM <database name>.<table name>;      	   					    # Returns only the specified columns from the table
+	  ex. SELECT industry, title FROM movies;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	3. SELECT with WHERE Clause
+		SELECT * FROM <database name>.<table name> WHERE condition;  		    	    			    # Returns rows that meet the specified condition
+	  ex. SELECT * FROM movies WHERE industry="Hollywood";
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	4. COUNT with GROUP BY
+		SELECT COUNT(*) FROM <database name>.<table name> WHERE condition;          		  	   # Counts the number of rows for each unique value in the specified column
+	  ex. SELECT COUNT(*)  FROM movies WHERE industry="Hollywood" ;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	5. SELECT with DISTINCT
+		SELECT DISTINCT column1 FROM <database name>.<table name>;    		    				   # Returns unique values from the specified column
+	  ex. SELECT DISTINCT industry FROM movies;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	6. Wildcard Search
+		SELECT * FROM <database name>.<table name> WHERE column LIKE '%pattern%';   		            # Returns rows where the specified column contains the pattern (wildcard search)
+	  ex. SELECT * FROM movies WHERE title like "%Thor%";
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	7. Empty Rows
+		SELECT * FROM <database name>.<table name> WHERE  <column name> = " ";			     # Returns rows where the specified column is empty
+	  ex. SELECT * FROM movies where studio = " ";
+          ex. SELECT * FROM movies WHERE imdb_rating IS NULL;         						    	     # numerical value
+          ex. SELECT * FROM movies WHERE imdb_rating IS NOT NULL;         						
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	8. Filtering Query
+		SELECT * FROM <database name>.<table name> WHERE <column name >= 9;  		  	   	     # Returns rows with a rating of 9 or higher
+	  ex. SELECT * FROM movies WHERE imdb_rating >=9;
+	  ex. SELECT * FROM movies WHERE imdb_rating between 6 AND 8;
+       	  ex. SELECT * FROM movies WHERE release_year IN (2020,2021,2022);
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	9. ORDER BY Query
+		SELECT * FROM <database_name>.<table_name> ORDER BY column_name ASC;   		             	      #  Returns all rows from the table, ordered by the specified column in ascending order
+	  ex. SELECT * FROM movies ORDER BY imdb_rating DESC;                                                                    	      # Greater to lower
+	  ex. SELECT * FROM movies ORDER BY imdb_rating ASC;                      				  	    	     	      # lower to Greater
+	  ex. SELECT * FROM movies ORDER BY imdb_rating DESC LIMIT 5;                                                       	      # limit it shows only the first five rows 
+	  ex. SELECT * FROM movies ORDER BY imdb_rating DESC LIMIT 5 OFFSET 1;                                        	      # limit starts from second row 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	10. Summary Analytics (MIN, MAX, AVG)
+		SELECT MIN(column) FROM <database_name>.<table_name>;                                                      	       # Return minimum value
+	        SELECT MAX(column) FROM <database_name>.<table_name>;                                                     	       # Return maximum value
+		SELECT AVG(column) FROM <database_name>.<table_name>;                                                   	       # Return Average
+	  ex. SELECT MAX(imdb_rating) as Max, MIN(imdb_rating) as MIN, ROUND(AVG(imdb_rating),2) as Average FROM movies;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+	11. Group By Query
+		SELECT column1, COUNT(*) FROM <database_name>.<table_name> GROUP BY column1;          		# Groups rows that have the same values in column1 and counts the number of rows in each group
+	  ex. SELECT industry, COUNT(*) AS count, ROUND(AVG(imdb_rating),1) AS average FROM movies GROUP BY industry ORDER BY count DESC;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+	12. HAVING Query
+		SELECT column1, COUNT(*) FROM <database_name> GROUP BY column1 HAVING COUNT(*) > 1;  	# Groups rows by column1 and returns only those groups having more than 1 row
+
+  						           *** SELECT -->  FROM --> WHERE --> GROUP BY --> HAVING --> ORDER BY ***
+ 	   ex. SELECT release_year, COUNT(*) as count FROM movies GROUP BY release_year HAVING count>2 ORDER BY count DESC;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+       13. IF Condition Query
+		SELECT *, IF(condition, true, false) AS <name>  FROM <database_name>.<table_name>;          		 # if condition
+	  ex. SELECT *, IF(currency = 'USD', revenue * 77, revenue) AS revenue_INR  FROM financials; 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	14. CASE Query:
+		SELECT column1, 
+		CASE 
+        		WHEN condition1 THEN 'Result1'
+        		WHEN condition2 THEN 'Result2'
+        		ELSE 'DefaultResult'
+    		END AS new_column_name
+		FROM <database_name>.<table_name>;           												  # Evaluates multiple conditions and returns results based on the first matching condition
+
+	ex.  
+		select *,
+		case
+			when unit = "thousands" then round(revenue/1000,1)
+        		when unit = "billions" then round(revenue*1000,1)
+			else revenue
+  	  	end as revenue_ml
+		from financials;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL Joins:
+	15. Inner join
+		SELECT t1.*, t2.* 
+		FROM <database_name>.<table1_name> t1 
+		INNER JOIN <database_name>.<table2_name> t2 
+		ON t1.column = t2.column;   																  # Joins two tables on a common column and returns rows with matching values in both tables
+
+	  ex. select 
+		m.movie_id, title, budget, revenue, currency, unit
+		from movies m
+		inner join financials f
+		on m.movie_id = f.movie_id
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	16. left join
+		SELECT t1.*, t2.* 
+		FROM <database_name>.<table1_name> t1 
+		LEFT JOIN <database_name>.<table2_name> t2 
+		ON t1.column = t2.column;                            #  Joins two tables on a common column and returns all rows from the left table, along with matching rows from the right table. If no match is found, NULLs are returned for the 																													right table's columns.
+	  
+	  ex. select 
+		m.movie_id, title, budget, revenue, currency, unit
+		from movies m
+		left join financials f
+		on m.movie_id = f.movie_id
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	17. Right join
+		SELECT t1.*, t2.* 
+		FROM <database_name>.<table1_name> t1 
+		RIGHT JOIN <database_name>.<table2_name> t2 
+		ON t1.column = t2.column;                            #  Joins two tables on a common column and returns all rows from the right table, along with matching rows from the left table. If no match is found, NULLs are returned for the 																													left table's columns.
+	  
+	  ex. select 
+		m.movie_id, title, budget, revenue, currency, unit
+		from movies m
+		right join financials f
+		on m.movie_id = f.movie_id
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	18. full join
+		SELECT column1, column2 FROM <database_name>.<table1_name>
+		UNION
+		SELECT column1, column2 FROM <database_name>.<table2_name>;  					# Combines the result sets of two SELECT queries, returning only distinct rows from both queries
+
+	 ex. select 
+		   m.movie_id, title, budget, revenue, currency, unit
+	      from movies m left join financials f on m.movie_id = f.movie_id
+	      union
+	      select 
+	   	   f.movie_id, title, budget, revenue, currency, unit
+	      from movies m left join financials f on m.movie_id = f.movie_id
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
